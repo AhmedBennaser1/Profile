@@ -6,4 +6,4 @@ tags: active-directory, kerberos, delegation
 excerpt: "Leveraging unconstrained delegation to compromise a domain controller via Kerberos ticket theft."
 ---
 
-Your writeup here...
+```sdqsdq```
