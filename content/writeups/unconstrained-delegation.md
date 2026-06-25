@@ -7,3 +7,5 @@ excerpt: "Leveraging unconstrained delegation to compromise a domain controller 
 ---
 
 ```sdqsdq```
+![](image.png)
+
