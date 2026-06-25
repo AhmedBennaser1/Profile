@@ -16,7 +16,7 @@ const writeups = [
     "title": "Abusing Unconstrained Delegation in AD",
     "category": "writeup",
     "date": "2025-05-15",
-    "excerpt": "Leveraging unconstrained delegation to compromise a domain controller via Kerberos ticket theft.",
+    "excerpt": "Leveraging unconstrained delegation to compromise a domain controller via Kerberos ticket theft.asdasdasdasdasda",
     "tags": [
       "active-directory",
       "kerberos",
