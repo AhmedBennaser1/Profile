@@ -1,0 +1,48 @@
+// ===== Shared Post Data =====
+const writeups = [
+  {
+    title: "HTB: Connected — Full Walkthrough",
+    category: "writeup",
+    date: "2025-06-20",
+    excerpt: "Exploiting SQL injection to RCE on a HackTheBox machine, covering enumeration through privilege escalation.",
+    tags: ["htb", "sqli", "rce"]
+  },
+  {
+    title: "Abusing Unconstrained Delegation in AD",
+    category: "writeup",
+    date: "2025-05-15",
+    excerpt: "Leveraging unconstrained delegation to compromise a domain controller via Kerberos ticket theft.",
+    tags: ["active-directory", "kerberos", "delegation"]
+  },
+  {
+    title: "NTLM Relay & Forced Authentication",
+    category: "writeup",
+    date: "2025-05-10",
+    excerpt: "Forcing NTLM authentication callbacks to capture and relay credentials across the network.",
+    tags: ["ntlm", "relay", "credentials"]
+  },
+  {
+    title: "Nexus Repository — Path Traversal to RCE",
+    category: "writeup",
+    date: "2025-04-22",
+    excerpt: "Exploiting CVE-2024-4956 in Sonatype Nexus Repository Manager for unauthenticated file read.",
+    tags: ["cve", "nexus", "path-traversal"]
+  }
+];
+
+const notes = [
+  {
+    title: "AD ACLs Cheatsheet",
+    category: "cheatsheet",
+    date: "2025-06-01",
+    excerpt: "Quick reference for exploiting Active Directory ACL misconfigurations — GenericAll, WriteDACL, and more.",
+    tags: ["active-directory", "acl", "cheatsheet"]
+  },
+  {
+    title: "Linux Privilege Escalation Notes",
+    category: "notes",
+    date: "2025-03-18",
+    excerpt: "Common privesc vectors: SUID binaries, capabilities, cron jobs, PATH hijacking, and kernel exploits.",
+    tags: ["linux", "privesc", "enumeration"]
+  }
+];

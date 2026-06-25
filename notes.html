@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes — natashi</title>
+  <meta name="description" content="Cybersecurity notes and cheatsheets by natashi — AD, Linux privesc, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-bracket">[</span>natashi<span class="logo-bracket">]</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="writeups.html" class="nav-link">Writeups</a>
+      <a href="notes.html" class="nav-link active">Notes</a>
+      <a href="about.html" class="nav-link">About</a>
+    </div>
+  </nav>
+
+  <main class="container page-content">
+    <div class="page-header">
+      <h1 class="page-title"><span class="section-icon">📝</span> Notes & Cheatsheets</h1>
+      <p class="page-desc">Quick references, technique breakdowns, and things worth remembering.</p>
+    </div>
+    <div class="posts-grid" id="notes-grid"></div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 natashi — built with ☕ and curiosity</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script>renderPosts(notes, 'notes-grid');</script>
+</body>
+</html>
