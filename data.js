@@ -10,7 +10,8 @@ const writeups = [
       "htb",
       "sqli",
       "rce"
-    ]
+    ],
+    "slug": "htb-connected"
   },
   {
     "title": "Abusing Unconstrained Delegation in AD",
@@ -21,7 +22,8 @@ const writeups = [
       "active-directory",
       "kerberos",
       "delegation"
-    ]
+    ],
+    "slug": "unconstrained-delegation"
   },
   {
     "title": "NTLM Relay & Forced Authentication",
@@ -32,7 +34,8 @@ const writeups = [
       "ntlm",
       "relay",
       "credentials"
-    ]
+    ],
+    "slug": "ntlm-relay"
   },
   {
     "title": "Nexus Repository — Path Traversal to RCE",
@@ -43,7 +46,8 @@ const writeups = [
       "cve",
       "nexus",
       "path-traversal"
-    ]
+    ],
+    "slug": "nexus-path-traversal"
   }
 ];
 
@@ -57,7 +61,8 @@ const notes = [
       "active-directory",
       "acl",
       "cheatsheet"
-    ]
+    ],
+    "slug": "ad-acls-cheatsheet"
   },
   {
     "title": "Linux Privilege Escalation Notes",
@@ -68,6 +73,7 @@ const notes = [
       "linux",
       "privesc",
       "enumeration"
-    ]
+    ],
+    "slug": "linux-privesc"
   }
 ];

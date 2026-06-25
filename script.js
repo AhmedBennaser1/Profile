@@ -3,7 +3,7 @@ function renderPosts(data, containerId) {
   const grid = document.getElementById(containerId);
   if (!grid) return;
   grid.innerHTML = data.map(post => `
-    <a class="post-card" href="#">
+    <a class="post-card" href="${(window.location.pathname.includes('/posts/') ? '../' : '')}posts/${post.slug}.html">
       <div class="post-header">
         <span class="post-category">${post.category}</span>
         <span class="post-date">${post.date}</span>

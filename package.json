@@ -1,0 +1,23 @@
+{
+  "name": "natashi.github.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhmedBennaser1/Profile.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AhmedBennaser1/Profile/issues"
+  },
+  "homepage": "https://github.com/AhmedBennaser1/Profile#readme",
+  "dependencies": {
+    "marked": "^18.0.5"
+  }
+}

