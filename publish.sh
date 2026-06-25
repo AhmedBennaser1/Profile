@@ -12,6 +12,6 @@ node build.js
 MSG="${1:-Update content}"
 git add -A
 git commit -m "$MSG" || echo "Nothing to commit."
-git push
+git push -u origin main
 
 echo "✓ Published!"
