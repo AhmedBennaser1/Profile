@@ -7,3 +7,9 @@ excerpt: "Forcing NTLM authentication callbacks to capture and relay credentials
 ---
 
 Your writeup here...
+
+
+```
+your text or command here
+
+```

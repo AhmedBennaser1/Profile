@@ -2,6 +2,17 @@
 // To add content, create .md files in content/writeups/ or content/notes/
 const writeups = [
   {
+    "title": "payloads",
+    "category": "writeup",
+    "date": "2026-06-25",
+    "excerpt": "DLL side-loading this abusees the windows dll search order when an application attempts to load its dependencies :   The...",
+    "tags": [
+      "windows",
+      "evasion"
+    ],
+    "slug": "payloads"
+  },
+  {
     "title": "HTB: Connected — Full Walkthrough",
     "category": "writeup",
     "date": "2025-06-20",
