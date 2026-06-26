@@ -120,10 +120,29 @@ function scanDir(dir) {
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Clean old posts
+// Image/media file extensions to copy alongside posts
+const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
+
+function copyImages(srcDir, destDir) {
+  if (!fs.existsSync(srcDir)) return 0;
+  let count = 0;
+  fs.readdirSync(srcDir).forEach(f => {
+    const ext = path.extname(f).toLowerCase();
+    if (IMAGE_EXTS.includes(ext)) {
+      fs.copyFileSync(path.join(srcDir, f), path.join(destDir, f));
+      count++;
+    }
+  });
+  return count;
+}
+
+// Clean old posts and images
 if (fs.existsSync(POSTS_OUT)) {
   fs.readdirSync(POSTS_OUT).forEach(f => {
-    if (f.endsWith('.html')) fs.unlinkSync(path.join(POSTS_OUT, f));
+    const ext = path.extname(f).toLowerCase();
+    if (f.endsWith('.html') || IMAGE_EXTS.includes(ext)) {
+      fs.unlinkSync(path.join(POSTS_OUT, f));
+    }
   });
 } else {
   fs.mkdirSync(POSTS_OUT, { recursive: true });
@@ -138,6 +157,12 @@ allPosts.forEach(post => {
   const html = postTemplate(post);
   fs.writeFileSync(path.join(POSTS_OUT, `${post.slug}.html`), html, 'utf-8');
 });
+
+// Copy images from content dirs into posts/ so relative paths resolve
+let imgCount = 0;
+imgCount += copyImages(WRITEUPS_DIR, POSTS_OUT);
+imgCount += copyImages(NOTES_DIR, POSTS_OUT);
+console.log(`✓ Copied ${imgCount} image(s) to posts/`);
 
 // Generate data.js (without body content, just metadata for listings)
 const cleanWriteups = writeups.map(({ body, ...rest }) => rest);
