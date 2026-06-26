@@ -53,8 +53,44 @@ function parseFrontmatter(filePath) {
   };
 }
 
+// Image/media file extensions to handle
+const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
+
+function isImageFile(filename) {
+  return IMAGE_EXTS.includes(path.extname(filename).toLowerCase());
+}
+
+// Extract image filenames referenced in markdown body
+function extractImageRefs(mdBody) {
+  const refs = [];
+  // Match ![alt](path) markdown images
+  const regex = /!\[[^\]]*\]\(([^)]+)\)/g;
+  let m;
+  while ((m = regex.exec(mdBody)) !== null) {
+    const src = m[1].trim();
+    // Only handle local relative images (skip http/https URLs)
+    if (!src.startsWith('http://') && !src.startsWith('https://')) {
+      refs.push(src);
+    }
+  }
+  return refs;
+}
+
+// Rewrite image src paths in HTML: "image.png" → "images/<slug>/image.png"
+function rewriteImagePaths(html, slug) {
+  return html.replace(/<img\s+([^>]*?)src="([^"]+)"([^>]*?)>/g, (match, before, src, after) => {
+    // Skip absolute URLs
+    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('/')) {
+      return match;
+    }
+    return `<img ${before}src="images/${slug}/${src}"${after}>`;
+  });
+}
+
 function postTemplate(post) {
-  const htmlBody = marked.parse(post.body);
+  let htmlBody = marked.parse(post.body);
+  // Rewrite relative image paths to point to images/<slug>/
+  htmlBody = rewriteImagePaths(htmlBody, post.slug);
   const tags = post.tags.map(t => `<span class="post-tag">#${t}</span>`).join('');
 
   return `<!DOCTYPE html>
@@ -120,30 +156,25 @@ function scanDir(dir) {
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Image/media file extensions to copy alongside posts
-const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
-
-function copyImages(srcDir, destDir) {
-  if (!fs.existsSync(srcDir)) return 0;
-  let count = 0;
-  fs.readdirSync(srcDir).forEach(f => {
-    const ext = path.extname(f).toLowerCase();
-    if (IMAGE_EXTS.includes(ext)) {
-      fs.copyFileSync(path.join(srcDir, f), path.join(destDir, f));
-      count++;
-    }
+// Recursively remove a directory
+function rmDir(dirPath) {
+  if (!fs.existsSync(dirPath)) return;
+  fs.readdirSync(dirPath).forEach(f => {
+    const fp = path.join(dirPath, f);
+    if (fs.statSync(fp).isDirectory()) rmDir(fp);
+    else fs.unlinkSync(fp);
   });
-  return count;
+  fs.rmdirSync(dirPath);
 }
 
 // Clean old posts and images
 if (fs.existsSync(POSTS_OUT)) {
   fs.readdirSync(POSTS_OUT).forEach(f => {
-    const ext = path.extname(f).toLowerCase();
-    if (f.endsWith('.html') || IMAGE_EXTS.includes(ext)) {
-      fs.unlinkSync(path.join(POSTS_OUT, f));
-    }
+    const fp = path.join(POSTS_OUT, f);
+    if (f.endsWith('.html')) fs.unlinkSync(fp);
   });
+  // Clean old images directory
+  rmDir(path.join(POSTS_OUT, 'images'));
 } else {
   fs.mkdirSync(POSTS_OUT, { recursive: true });
 }
@@ -151,18 +182,44 @@ if (fs.existsSync(POSTS_OUT)) {
 const writeups = scanDir(WRITEUPS_DIR);
 const notes = scanDir(NOTES_DIR);
 
-// Generate individual post pages
+// Map each content dir to its posts for image copying
+const dirPostMap = [
+  { dir: WRITEUPS_DIR, posts: writeups },
+  { dir: NOTES_DIR, posts: notes },
+];
+
+// Generate post pages + copy images per post
+let imgCount = 0;
 const allPosts = [...writeups, ...notes];
 allPosts.forEach(post => {
   const html = postTemplate(post);
   fs.writeFileSync(path.join(POSTS_OUT, `${post.slug}.html`), html, 'utf-8');
 });
 
-// Copy images from content dirs into posts/ so relative paths resolve
-let imgCount = 0;
-imgCount += copyImages(WRITEUPS_DIR, POSTS_OUT);
-imgCount += copyImages(NOTES_DIR, POSTS_OUT);
-console.log(`✓ Copied ${imgCount} image(s) to posts/`);
+dirPostMap.forEach(({ dir, posts }) => {
+  if (!fs.existsSync(dir)) return;
+  posts.forEach(post => {
+    // Find images referenced by this post
+    const imageRefs = extractImageRefs(post.body);
+    if (imageRefs.length === 0) return;
+
+    // Create posts/images/<slug>/
+    const imgDir = path.join(POSTS_OUT, 'images', post.slug);
+    fs.mkdirSync(imgDir, { recursive: true });
+
+    imageRefs.forEach(imgFile => {
+      const srcPath = path.join(dir, imgFile);
+      const destPath = path.join(imgDir, imgFile);
+      if (fs.existsSync(srcPath)) {
+        fs.copyFileSync(srcPath, destPath);
+        imgCount++;
+      } else {
+        console.warn(`  ⚠ Image not found: ${imgFile} (referenced in ${post.slug}.md)`);
+      }
+    });
+  });
+});
+console.log(`✓ Copied ${imgCount} image(s) to posts/images/<slug>/`);
 
 // Generate data.js (without body content, just metadata for listings)
 const cleanWriteups = writeups.map(({ body, ...rest }) => rest);
