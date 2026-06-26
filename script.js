@@ -17,6 +17,34 @@ function renderPosts(data, containerId) {
   `).join('');
 }
 
+// ===== Copy buttons on code blocks =====
+(function() {
+  document.querySelectorAll('.post-article-body pre').forEach(pre => {
+    // Make the pre block a positioning context
+    pre.style.position = 'relative';
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.innerHTML = '📋 Copy';
+    btn.title = 'Copy to clipboard';
+
+    btn.addEventListener('click', () => {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.innerHTML = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = '📋 Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    pre.appendChild(btn);
+  });
+})();
+
 // ===== Particle Background =====
 (function() {
   const canvas = document.getElementById('particles');
